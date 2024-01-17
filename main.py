@@ -22,7 +22,7 @@ if __name__ == "__main__":
             path = askdirectory(title='Select Folder')
             #To this user chosen path we append our main file directory "pwmanager1.0"
             directory = os.path.join(path, r"pwmanager1.0")
-            db_path = directory
+            db_path = os.path.join(directory, r"sqlite.db")
             #we create a path file inside directory pwmanager. Not sure yet if this is even useful
             pathfile = os.path.join(directory, r"path.txt")
             os.mkdir(directory)
@@ -30,7 +30,6 @@ if __name__ == "__main__":
             #write to this path.txt the path for further use.
             with open(pathfile, 'w') as file:
                 file.write(pathfile)
-            print(db_path)
             dbinit.init_db(db_path)
         #No skips the folder creation, not sure how to move forward yet.    
         elif installinit.lower() == 'no':
