@@ -4,7 +4,7 @@ from pathlib import Path
 import hashlib
 import secrets
 import getpass
-
+import login
 
 #Initialize database, using SQLite.
 def init_db(db_path):
@@ -12,17 +12,16 @@ def init_db(db_path):
     #initialize 2 tables: user_auth and passwords.
     try:
         init_users = """ CREATE TABLE IF NOT EXISTS user_auth (
-                                        id integer PRIMARY KEY,
-                                        user text NOT NULL,
-                                        password text NOT NULL,
-                                        salt text NOT NULL
+                                        user TEXT PRIMARY KEY,
+                                        password TEXT NOT NULL,
+                                        salt TEXT NOT NULL
                                     ); """
         init_table = """ CREATE TABLE IF NOT EXISTS passwords (
-                                        id integer PRIMARY KEY,
-                                        user_id INTEGER,
-                                        website text,
-                                        password text,
-                                        FOREIGN KEY (user_id) REFERENCES user_auth (id)
+                                        id INTEGER PRIMARY KEY,
+                                        user TEXT,
+                                        website TEXT,
+                                        password TEXT,
+                                        FOREIGN KEY (user) REFERENCES user_auth (user)
                                     ); """
         #opens a connection and stores it in conn
         conn = sqlite3.connect(db_path)
@@ -54,6 +53,15 @@ def init_db(db_path):
         #commit saves changes.
         conn.commit()
         print("Database successfully created.")
+        want_to_login = input("Do you want to login? Yes or No ")
+        if want_to_login.lower() == 'yes':
+            pathdb = "C:/pwpath/path.txt"
+            with open(pathdb, 'r') as file:
+                path = file.read()
+                #call login_handle with path of database.
+                login.handle_login(path)
+        if want_to_login.lower() == 'no':
+            pass
     except Error as e:
         print(e)
     finally:
