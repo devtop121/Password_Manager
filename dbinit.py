@@ -1,11 +1,9 @@
 import sqlite3
 from sqlite3 import Error
-import os, sys, stat
 from pathlib import Path
-import tkinter as tk
-from tkinter.filedialog import askdirectory
 import hashlib
 import secrets
+import getpass
 
 
 #Initialize database, using SQLite.
@@ -36,8 +34,18 @@ def init_db(db_path):
         #generate a salt that is different for each database(user)
         salt = secrets.token_hex(16) #16-byte (32 characters) hex salt
         user = input("Enter a username: ")
-        password = input("Enter a password: ")
-        combined_password = password + salt
+        #function for making double checking your password. if they dont match it calls the function again.
+        def password_create():
+            password = getpass.getpass("Enter a password: ")
+            re_password = getpass.getpass("Enter password again: ")
+            if password != re_password:
+                print("Passwords didn't match.")
+                return password_create()
+            else:
+                print("Password created.")
+                return password
+            
+        combined_password = password_create() + salt
         hashed_password = hashlib.sha256(combined_password.encode()).hexdigest()
         insert_auth = "INSERT INTO user_auth (user, password, salt) VALUES (?,?,?)"
         #add user to users with name, hashed password and unique salt. i used cryptographic hashing instead of password hashing.

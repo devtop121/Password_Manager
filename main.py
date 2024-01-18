@@ -3,7 +3,7 @@ from pathlib import Path
 import tkinter as tk
 from tkinter.filedialog import askdirectory
 import dbinit
-
+import login
 #gets a value after initialize is finished.
 db_path = None
 
@@ -33,8 +33,7 @@ if __name__ == "__main__":
             dbinit.init_db(db_path)
         #No skips the folder creation, not sure how to move forward yet.    
         elif installinit.lower() == 'no':
-            print("Opening login screen")
-            pass
+            login.handle_login()            
         else:
             initialize()
     initialize()
