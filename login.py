@@ -7,7 +7,9 @@ import main_menu
 #function for checking user and password from auth_user table in database.
 def handle_login(db_path):
     user = input("Username: ")
+    user = user.strip()
     password = getpass.getpass("Password: ")
+    password = password.strip()
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     #takes the whole row where user is in database
@@ -21,7 +23,10 @@ def handle_login(db_path):
         #hash it and compare
         password = hashlib.sha256(password.encode()).hexdigest()
         if password == result[1]:
-            main_menu.mainmenu(user)
+            conn.close()
+            main_menu.mainmenu(user, db_path)
+        else:
+            print(f"Incorrect username or password")
     else:
-        print(f"No user named {user}")
+        print(f"Incorrect username or password")
     conn.close()

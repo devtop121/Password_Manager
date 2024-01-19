@@ -17,9 +17,8 @@ def init_db(db_path):
                                         salt TEXT NOT NULL
                                     ); """
         init_table = """ CREATE TABLE IF NOT EXISTS passwords (
-                                        id INTEGER PRIMARY KEY,
-                                        user TEXT,
                                         website TEXT,
+                                        user TEXT,
                                         password TEXT,
                                         FOREIGN KEY (user) REFERENCES user_auth (user)
                                     ); """
