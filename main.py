@@ -6,7 +6,6 @@ import dbinit
 import login
 #gets a value after initialize is finished.
 db_path = None
-
 #if main.py is ran directly as a script, not from other scripts as an import
 if __name__ == "__main__":
     #ask for install or login, Tkinter could be used for a proper installation gui
