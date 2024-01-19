@@ -33,6 +33,7 @@ def init_db(db_path):
         #generate a salt that is different for each database(user)
         salt = secrets.token_hex(16) #16-byte (32 characters) hex salt
         user = input("Enter a username: ")
+
         #function for making double checking your password. if they dont match it calls the function again.
         def password_create():
             password = getpass.getpass("Enter a password: ")
@@ -62,6 +63,7 @@ def init_db(db_path):
                 login.handle_login(path)
         if want_to_login.lower() == 'no':
             pass
+    #incase of error it prints the error e which is determined by error library.
     except Error as e:
         print(e)
     finally:
