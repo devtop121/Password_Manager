@@ -14,7 +14,7 @@ def mainmenu(user, db_path):
     def on_closing():
         root.destroy()
         sys.exit()
-
+        
     # Create main window
     root = Tk()
     root.geometry("800x600")
@@ -40,7 +40,7 @@ def mainmenu(user, db_path):
     #connect to the database to get users information
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
-    c.execute("SELECT * FROM passwords WHERE user = ?", (user,))
+    c.execute("SELECT website, username, password FROM passwords WHERE user = ?", (user,))
     rows = c.fetchall()
     conn.close()
 
@@ -66,8 +66,17 @@ def mainmenu(user, db_path):
     populate_treeview(tree, rows)
 
     tree.pack()
+    #if a window is open to prevent multiple opening when spamming
+    input_window_open = False
 
     def insert_data():
+        if getattr(insert_data, 'input_window_open', False):
+            return
+        insert_data.input_window_open = True
+
+        def on_close():
+            insert_data.input_window_open = False
+            input_window.destroy()
     # Function to handle the insertion of data
         def handle_insert():
             # Get values from entry widgets
@@ -76,8 +85,10 @@ def mainmenu(user, db_path):
             password = password_entry.get()
             # Close the input window
             input_window.destroy()
-            
 
+            insert_data.input_window_open = False
+            
+    
         # Create a new window for user input
         input_window = Toplevel(frame2)
         input_window.title("Insert Data")
@@ -91,6 +102,7 @@ def mainmenu(user, db_path):
         y_position = (input_window.winfo_screenheight() - height) // 2
 
         input_window.geometry(f"+{x_position}+{y_position}")
+        input_window.protocol("WM_DELETE_WINDOW", on_close)
 
         # Entry widgets for user input
         service_label = Label(input_window, text="Service:")
@@ -111,6 +123,7 @@ def mainmenu(user, db_path):
         # Button to confirm and insert data
         confirm_button = Button(input_window, text="Confirm", command=handle_insert)
         confirm_button.pack()
+
     def remove_data():
         pass
   
