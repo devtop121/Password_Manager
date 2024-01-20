@@ -4,6 +4,7 @@ import getpass
 import hashlib
 from tkinter import *
 import tkinter.ttk as ttk
+from tkinter import simpledialog
 #rows contains the database for said user
 def populate_treeview(tree, rows):
     for row in rows:
@@ -66,9 +67,59 @@ def mainmenu(user, db_path):
 
     tree.pack()
 
-    # Add widgets to frame2
-    label2 = Label(frame2, text=f"Modify your passwords here.")
-    label2.pack()
+    def insert_data():
+    # Function to handle the insertion of data
+        def handle_insert():
+            # Get values from entry widgets
+            service = service_entry.get()
+            username = username_entry.get()
+            password = password_entry.get()
+            # Close the input window
+            input_window.destroy()
+            
+
+        # Create a new window for user input
+        input_window = Toplevel(frame2)
+        input_window.title("Insert Data")
+        input_window.geometry("400x300")
+        # Calculate the position to center the window on the screen
+        # Center the window on the screen
+        input_window.update_idletasks()
+        width = input_window.winfo_width()
+        height = input_window.winfo_height()
+        x_position = (input_window.winfo_screenwidth() - width) // 2
+        y_position = (input_window.winfo_screenheight() - height) // 2
+
+        input_window.geometry(f"+{x_position}+{y_position}")
+
+        # Entry widgets for user input
+        service_label = Label(input_window, text="Service:")
+        service_label.pack()
+        service_entry = Entry(input_window)
+        service_entry.pack()
+
+        username_label = Label(input_window, text="Username:")
+        username_label.pack()
+        username_entry = Entry(input_window)
+        username_entry.pack()
+
+        password_label = Label(input_window, text="Password:")
+        password_label.pack()
+        password_entry = Entry(input_window, show="*")  # Use show="*" to hide the password
+        password_entry.pack()
+
+        # Button to confirm and insert data
+        confirm_button = Button(input_window, text="Confirm", command=handle_insert)
+        confirm_button.pack()
+    def remove_data():
+        pass
+  
+    
+    add_button = Button(frame2, text="Insert data", command=insert_data)
+    add_button.pack()
+
+    remove_button = Button(frame2, text="Remove data", command=remove_data)
+    remove_button.pack()
 
     # Add widgets to frame2
     label3 = Label(frame3, text="2 Engineers and a hunger for perfected password manager.")

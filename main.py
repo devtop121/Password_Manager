@@ -11,9 +11,9 @@ if __name__ == "__main__":
     #ask for install or login, Tkinter could be used for a proper installation gui
     def initialize():
         global db_path
-        installinit = input("Yes for a new install, No for logging in: ")
+        installinit = input("Install for a new install, Login for logging in, Register for a new user: ")
         #Yes initializes the folders, tkinter is used for simple UI
-        if installinit.lower() == 'yes':
+        if installinit.lower() == 'install':
             #root is used to hide a small window tkinter puts up as default.
             root = tk.Tk()
             root.withdraw()
@@ -32,7 +32,7 @@ if __name__ == "__main__":
                 file.write(db_path)
             dbinit.init_db(db_path)
         #No skips the folder creation, it calls login.py's handle_login function with the path inside path.txt
-        elif installinit.lower() == 'no':
+        elif installinit.lower() == 'login':
             pathdb = "C:/pwpath/path.txt"
             #Try to find the path for database. if it fails to find it it means you have not installed the program.
             try:
@@ -41,6 +41,14 @@ if __name__ == "__main__":
                     login.handle_login(content)
             except Exception as e:
                 print("An error occurred, maybe the link to your database has been cut or you have yet to install the program.")
+        elif installinit.lower() == 'register':
+            pathdb = "C:/pwpath/path.txt"
+            try:
+                with open(pathdb, 'r') as file:
+                    content1 = file.read()
+                    login.new_user(content1)
+            except Exception as e:
+                print("An error occurred, you most likely are yet to install the program. Install it before creating new users.")
         else:
             initialize()
     initialize()

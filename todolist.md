@@ -8,6 +8,5 @@
                                path.txt          main.py            database(sqlite)
                               Static location of path.txt which contains path to database: C:/pwpath/path.txt
                               
-2: Make a interface for simpler navigation. I think using Tkinter should be good enough and it seems good.
-3: Think about securing information and movement of data. Update: Managed to make secure password storing in database and login checks this.
-4. Login interface with Tkinter.
+2: Make a interface for simpler navigation. I think using Tkinter should be good     enough and it seems good. Update: started working on allowing users to edit and delete existing data. yet to work on displaying this in the "passwords" window.
+3. Login interface with Tkinter.
