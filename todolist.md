@@ -10,3 +10,7 @@
                               
 2: Make a interface for simpler navigation. I think using Tkinter should be good     enough and it seems good. Update: started working on allowing users to edit and delete existing data. yet to work on displaying this in the "passwords" window.
 3. Login interface with Tkinter.
+4. make deleting data possible for user.
+5. Figure out a way to protect inserted data.
+
+

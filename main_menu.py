@@ -5,6 +5,7 @@ import hashlib
 from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import simpledialog
+import dbmodify
 #rows contains the database for said user
 def populate_treeview(tree, rows):
     for row in rows:
@@ -42,6 +43,8 @@ def mainmenu(user, db_path):
     c = conn.cursor()
     c.execute("SELECT website, username, password FROM passwords WHERE user = ?", (user,))
     rows = c.fetchall()
+    c.execute("SELECT salt FROM user_auth WHERE user = ?", (user,))
+    salt = c.fetchone()
     conn.close()
 
     # Add widgets to frame1
@@ -85,8 +88,9 @@ def mainmenu(user, db_path):
             password = password_entry.get()
             # Close the input window
             input_window.destroy()
-
             insert_data.input_window_open = False
+            dbmodify.add_data(db_path,user, service, username, password)
+
             
     
         # Create a new window for user input
@@ -125,7 +129,7 @@ def mainmenu(user, db_path):
         confirm_button.pack()
 
     def remove_data():
-        pass
+        dbmodify.remove_data()
   
     
     add_button = Button(frame2, text="Insert data", command=insert_data)
