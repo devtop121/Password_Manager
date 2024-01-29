@@ -6,8 +6,25 @@ from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import simpledialog
 import dbmodify
+import webbrowser
+import requests
+
 
 global tree
+#Get a random fact of the day
+def daily_random():
+    api_url = 'https://uselessfacts.jsph.pl/'
+    endpoint = '/api/v2/facts/today'
+    full_url = f'{api_url}{endpoint}'
+    response = requests.get(full_url)
+    # Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        # Print the response content (assuming it's in JSON format)
+        return response.json().get('text')
+    else:
+        return "Couldn't load daily fact."
+#call the function and store answer in random_fact
+random_fact = daily_random()
 
 #rows contains the database for said user
 def populate_treeview(tree, rows):
@@ -130,7 +147,7 @@ def mainmenu(user, db_path):
 
         password_label = Label(input_window, text="Password:")
         password_label.pack()
-        password_entry = Entry(input_window, show="*")  # Use show="*" to hide the password
+        password_entry = Entry(input_window) 
         password_entry.pack()
 
         # Button to confirm and insert data
@@ -189,6 +206,9 @@ def mainmenu(user, db_path):
     # Add widgets to frame2
     label3 = Label(frame3, text="2 Engineers and a hunger for perfected password manager.")
     label3.pack()
+    label4 = Label(frame3, text=f"Random fact of the day: {random_fact}")
+    label4.pack()
+
     notebook.add(frame1, text="Passwords")
     notebook.add(frame2, text="Add/remove passwords")
     notebook.add(frame3, text="About us")

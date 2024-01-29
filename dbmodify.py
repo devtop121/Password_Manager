@@ -27,9 +27,8 @@ def add_data(db_path,user, website, username, password):
         c.execute("SELECT salt FROM user_auth WHERE user = ?", (user,))
         salt = c.fetchone()
         salt = salt[0]
-
         insert_passwords = "INSERT INTO passwords (user, website, username, password) VALUES (?,?,?,?)"
-        c.execute(insert_passwords, (user,website,username, password))
+        c.execute(insert_passwords, (user,website,username,password))
         conn.commit()
         print("Added data successfully.")
     except Exception as e:
