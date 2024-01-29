@@ -37,12 +37,3 @@ def add_data(db_path,user, website, username, password):
     finally:
         conn.close()
         main_menu.update_interface(db_path, user)
-# function for removing inserted data.
-def remove_data():
-    try:
-        from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-        from cryptography.hazmat.backends import default_backend
-        from cryptography.hazmat.primitives import padding
-    except Exception as e:
-        print(e)
-    print("removing data")

@@ -120,6 +120,8 @@ def mainmenu(user, db_path):
         service_label.pack()
         service_entry = Entry(input_window)
         service_entry.pack()
+        
+        service_entry.focus_set()
 
         username_label = Label(input_window, text="Username:")
         username_label.pack()
@@ -134,9 +136,48 @@ def mainmenu(user, db_path):
         # Button to confirm and insert data
         confirm_button = Button(input_window, text="Confirm", command=handle_insert)
         confirm_button.pack()
+        input_window.bind("<Return>", lambda event: handle_insert())
 
     def remove_data():
-        dbmodify.remove_data()
+        try:
+            from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+            from cryptography.hazmat.backends import default_backend
+            from cryptography.hazmat.primitives import padding
+        except Exception as e:
+            print(e)
+            return
+        
+        selected_items = tree.selection()
+
+        if not selected_items:
+            print("No items selected")
+            return
+        
+        for item in selected_items:
+            values = tree.item(item, 'values')
+            website, username, password = values  # Assuming this order of values
+            conn = sqlite3.connect(db_path)
+            c = conn.cursor()
+            # Find the corresponding id for the given website, username, and password
+            c.execute("SELECT id FROM passwords WHERE user = ? AND website = ? AND username = ? AND password = ?", (user, website, username, password))
+            result = c.fetchone()
+
+            if result:
+                primary_key = result[0]
+
+                # Perform the removal logic in the database
+                c.execute("DELETE FROM passwords WHERE id = ?", (primary_key,))
+                print(f"Removed data successfully")
+            else:
+                print("No corresponding record found for deletion.")
+            conn.commit()
+            conn.close()
+            update_interface(db_path, user)
+            
+            
+
+            
+        
   
     
     add_button = Button(frame2, text="Insert data", command=insert_data)
