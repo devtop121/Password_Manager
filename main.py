@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter.filedialog import askdirectory
 import dbinit
 import login
+import subprocess
 #gets a value after initialize is finished.
 db_path = None
 #if main.py is ran directly as a script, not from other scripts as an import
@@ -14,6 +15,17 @@ if __name__ == "__main__":
         installinit = input("Install for a new install, Login for logging in, Register for a new user: ")
         #Yes initializes the folders, tkinter is used for simple UI
         if installinit.lower() == 'install':
+            #Function that installs encryption and decryption, planning to use AES
+            def install_cryptography():
+                try:
+                    python_command = sys.executable
+                    install_command = [python_command, "-m", "pip", "install", "cryptography"]
+                    subprocess.run(install_command, check=True)
+                    print("Encryption method installed successfully")
+                    print("Select a folder for install")
+                except subprocess.CalledProcessError as e:
+                    print(f"Error installing encryption method: {e}")
+            install_cryptography()
             #root is used to hide a small window tkinter puts up as default.
             root = tk.Tk()
             root.withdraw()

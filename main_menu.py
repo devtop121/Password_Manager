@@ -6,11 +6,17 @@ from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import simpledialog
 import dbmodify
+
+global tree
+
 #rows contains the database for said user
 def populate_treeview(tree, rows):
+    tree.delete(*tree.get_children())
     for row in rows:
         tree.insert("", "end", values=row)
+
 def mainmenu(user, db_path):
+    global tree
     # Shut down program once you close the window
     def on_closing():
         root.destroy()
@@ -39,6 +45,7 @@ def mainmenu(user, db_path):
     frame2 = ttk.Frame(notebook)
     frame3 = ttk.Frame(notebook)
     #connect to the database to get users information
+
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute("SELECT website, username, password FROM passwords WHERE user = ?", (user,))
@@ -50,7 +57,7 @@ def mainmenu(user, db_path):
     # Add widgets to frame1
     label1 = Label(frame1, text=f"Look at all these passwords!")
     label1.pack()
-    #Not too sure why first service doesnt work, but add 3 buttons which work.
+    #Not too sure why first service doesnt work, but add 3 columns which work.
     tree = ttk.Treeview(frame2, columns=("Service", "Username", "Password"), show="headings", height=20)
     tree.heading("#0", text="Service")
     tree.heading("#1", text="Service")
@@ -89,7 +96,7 @@ def mainmenu(user, db_path):
             # Close the input window
             input_window.destroy()
             insert_data.input_window_open = False
-            dbmodify.add_data(db_path,user, service, username, password)
+            dbmodify.add_data(db_path, user, service, username, password)
 
             
     
@@ -149,4 +156,15 @@ def mainmenu(user, db_path):
     notebook.pack(fill=BOTH, expand=True)
 
     root.mainloop()
+
+def update_interface(db_path, user):
+        global tree
+        conn = sqlite3.connect(db_path)
+        c = conn.cursor()
+        c.execute("SELECT website, username, password FROM passwords WHERE user = ?", (user,))
+        rows = c.fetchall()
+        c.execute("SELECT salt FROM user_auth WHERE user = ?", (user,))
+        salt = c.fetchone()
+        conn.close()
+        populate_treeview(tree, rows)
 

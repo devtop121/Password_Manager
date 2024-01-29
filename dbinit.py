@@ -5,6 +5,10 @@ import hashlib
 import secrets
 import getpass
 import login
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 #Initialize database, using SQLite.
 def init_db(db_path):
@@ -21,7 +25,7 @@ def init_db(db_path):
                                         user TEXT NOT NULL,
                                         website TEXT,
                                         username TEXT,
-                                        password TEXT,
+                                        password BLOB,
                                         FOREIGN KEY (user) REFERENCES user_auth (user)
                                     ); """
         #opens a connection and stores it in conn
@@ -45,6 +49,7 @@ def init_db(db_path):
             else:
                 print("Password created.")
                 return password
+        
             
         combined_password = password_create() + salt
         hashed_password = hashlib.sha256(combined_password.encode()).hexdigest()
