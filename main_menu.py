@@ -6,8 +6,8 @@ from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import simpledialog
 import dbmodify
-import webbrowser
 import requests
+from cryptography.fernet import Fernet
 
 
 global tree
@@ -69,6 +69,16 @@ def mainmenu(user, db_path):
     rows = c.fetchall()
     c.execute("SELECT salt FROM user_auth WHERE user = ?", (user,))
     salt = c.fetchone()
+    salt = salt[0]
+    salt = salt.encode('utf-8')
+    key = b'LvoCQRNZcrhoa5LEc3bUneNsApe3Ij2L-RMdbSDTUfk='
+    combined_key = key + salt
+    crypter = Fernet(combined_key)
+    def decrypt_value(encrypted_value):
+            return crypter.decrypt(encrypted_value).decode('utf-8')
+    decrypted_list = [(item[0], item[1], decrypt_value(item[2])) for item in rows]
+    c.execute("SELECT salt FROM user_auth WHERE user = ?", (user,))
+    salt = c.fetchone()
     conn.close()
 
     # Add widgets to frame1
@@ -90,7 +100,7 @@ def mainmenu(user, db_path):
     y_scrollbar.pack(side="right", fill="y")
 
     tree.configure(yscrollcommand=y_scrollbar.set)
-    populate_treeview(tree, rows)
+    populate_treeview(tree, decrypted_list)
 
     tree.pack()
     #if a window is open to prevent multiple opening when spamming
@@ -175,13 +185,16 @@ def mainmenu(user, db_path):
             website, username, password = values  # Assuming this order of values
             conn = sqlite3.connect(db_path)
             c = conn.cursor()
+            c.execute("SELECT salt FROM user_auth WHERE user = ?", (user,))
+            salt = c.fetchone()
+            salt = salt[0]
+            password = password + salt
+            password = hashlib.sha256(password.encode('utf-8')).hexdigest()
             # Find the corresponding id for the given website, username, and password
-            c.execute("SELECT id FROM passwords WHERE user = ? AND website = ? AND username = ? AND password = ?", (user, website, username, password))
+            c.execute("SELECT id FROM passwords WHERE user = ? AND website = ? AND username = ? AND hashed_password = ?", (user, website, username, password))
             result = c.fetchone()
-
             if result:
                 primary_key = result[0]
-
                 # Perform the removal logic in the database
                 c.execute("DELETE FROM passwords WHERE id = ?", (primary_key,))
                 print(f"Removed data successfully")
@@ -189,7 +202,7 @@ def mainmenu(user, db_path):
                 print("No corresponding record found for deletion.")
             conn.commit()
             conn.close()
-            update_interface(db_path, user)
+            update_interface(db_path, user, crypter)
             
             
 
@@ -218,14 +231,19 @@ def mainmenu(user, db_path):
 
     root.mainloop()
 
-def update_interface(db_path, user):
+def decrypt_value(encrypted_value, crypter):
+            return crypter.decrypt(encrypted_value).decode('utf-8')
+
+def update_interface(db_path, user, crypter):
         global tree
         conn = sqlite3.connect(db_path)
         c = conn.cursor()
         c.execute("SELECT website, username, password FROM passwords WHERE user = ?", (user,))
         rows = c.fetchall()
+        decrypted_list = [(item[0], item[1], decrypt_value(item[2], crypter)) for item in rows]
         c.execute("SELECT salt FROM user_auth WHERE user = ?", (user,))
         salt = c.fetchone()
         conn.close()
-        populate_treeview(tree, rows)
+        populate_treeview(tree, decrypted_list)
+        return decrypted_list
 

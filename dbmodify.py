@@ -7,6 +7,7 @@ import getpass
 import login
 import os
 import main_menu
+from cryptography.fernet import Fernet
 
 # function which updates database with the values from insert data window
 def add_data(db_path,user, website, username, password):
@@ -27,12 +28,19 @@ def add_data(db_path,user, website, username, password):
         c.execute("SELECT salt FROM user_auth WHERE user = ?", (user,))
         salt = c.fetchone()
         salt = salt[0]
-        insert_passwords = "INSERT INTO passwords (user, website, username, password) VALUES (?,?,?,?)"
-        c.execute(insert_passwords, (user,website,username,password))
+        salted_string = password + salt
+        salt = salt.encode('utf-8')
+        key = b'LvoCQRNZcrhoa5LEc3bUneNsApe3Ij2L-RMdbSDTUfk='
+        combined_key = key + salt
+        crypter = Fernet(combined_key)
+        pw = crypter.encrypt(password.encode('utf-8'))
+        hashed_password = hashlib.sha256(salted_string.encode('utf-8')).hexdigest()
+        insert_passwords = "INSERT INTO passwords (user, website, username, password, hashed_password) VALUES (?,?,?,?,?)"
+        c.execute(insert_passwords, (user,website,username,pw,hashed_password))
         conn.commit()
         print("Added data successfully.")
     except Exception as e:
         print(e)
     finally:
         conn.close()
-        main_menu.update_interface(db_path, user)
+        main_menu.update_interface(db_path, user, crypter)

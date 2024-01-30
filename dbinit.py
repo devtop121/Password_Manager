@@ -26,6 +26,7 @@ def init_db(db_path):
                                         website TEXT,
                                         username TEXT,
                                         password BLOB,
+                                        hashed_password TEXT,
                                         FOREIGN KEY (user) REFERENCES user_auth (user)
                                     ); """
         #opens a connection and stores it in conn
