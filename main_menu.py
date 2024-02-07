@@ -206,12 +206,6 @@ def mainmenu(user, db_path):
             conn.close()
             update_interface(db_path, user, crypter)
             
-            
-
-            
-        
-  
-    
     add_button = Button(frame2, text="Insert data", command=insert_data)
     add_button.pack()
 
