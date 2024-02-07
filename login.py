@@ -5,6 +5,7 @@ import secrets
 import login
 import main_menu
 from pathlib import Path
+import re
 #function for checking user and password from auth_user table in database.
 def handle_login(db_path):
     user = input("Username: ")
@@ -40,8 +41,28 @@ def new_user(db_path):
                 print("Passwords didn't match.")
                 return new_user(db_path)
             else:
-                insert_user(user, password, db_path)
-            
+                validate_password(user, password, db_path)
+
+def retype_password(db_path, user):
+            password = getpass.getpass("Enter a password: ")
+            re_password = getpass.getpass("Enter password again: ")
+            if password != re_password:
+                print("Passwords didn't match.")
+                return new_user(db_path)
+            else:
+                validate_password(user, password, db_path)
+
+def validate_password(user, password, db_path):
+        if len(password) < 12:
+            print("Password invalid. It should be atleast 12 characters and include uppercase, special character and a number.")
+            new_user(db_path)
+        res = bool(re.search(r'[A-Z]', password) and bool(re.search(r'\d', password) and bool(re.search(r'[!@#$%^&*(),.?":{}|<>]', password))))
+        if res == True:
+            insert_user(user, password, db_path)
+        else:
+            print("Password invalid. It should be atleast 12 characters and include uppercase, special character and a number.")
+            retype_password(db_path, user)
+
 def insert_user(user, password, db_path):
      try:
         conn = sqlite3.connect(db_path)

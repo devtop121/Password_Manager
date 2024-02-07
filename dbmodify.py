@@ -10,7 +10,7 @@ import main_menu
 from cryptography.fernet import Fernet
 
 # function which updates database with the values from insert data window
-def add_data(db_path,user, website, username, password):
+def add_data(db_path, user, website, username, password):
     try:
         from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
         from cryptography.hazmat.backends import default_backend
