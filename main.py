@@ -49,7 +49,6 @@ if __name__ == "__main__":
                     python_command = sys.executable
                     install_command = [python_command, "-m", "pip", "install", "cryptography"]
                     subprocess.run(install_command, check=True)
-                    print("Encryption method installed successfully")
                     print("Select a folder for install")
                 except subprocess.CalledProcessError as e:
                     print(f"Error installing encryption method: {e}")

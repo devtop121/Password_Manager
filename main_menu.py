@@ -12,6 +12,7 @@ from cryptography.fernet import Fernet
 
 
 global tree
+
 #Get a random fact of the day
 def daily_random():
     api_url = 'https://uselessfacts.jsph.pl/'
@@ -24,6 +25,7 @@ def daily_random():
         return response.json().get('text')
     else:
         return "Couldn't load daily fact."
+    
 #call the function and store answer in random_fact
 random_fact = daily_random()
 
@@ -205,12 +207,6 @@ def mainmenu(user, db_path):
             conn.close()
             update_interface(db_path, user, crypter)
             
-            
-
-            
-        
-  
-    
     add_button = Button(frame2, text="Insert data", command=insert_data)
     add_button.pack()
 
