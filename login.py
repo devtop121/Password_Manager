@@ -4,13 +4,14 @@ import hashlib
 import secrets
 import login
 import main_menu
+import tkinter as tk
 from pathlib import Path
 #function for checking user and password from auth_user table in database.
-def handle_login(db_path):
-    user = input("Username: ")
-    user = user.strip()
-    password = getpass.getpass("Password: ")
-    password = password.strip()
+def handle_login(db_path, user, password):
+    #user = input("Username: ")
+    #user = user.strip()
+    #password = getpass.getpass("Password: ")
+    #password = password.strip()
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     #takes the whole row where user is in database

@@ -3,6 +3,7 @@ import sqlite3
 import getpass
 import hashlib
 from tkinter import *
+from tkinter import messagebox
 import tkinter.ttk as ttk
 from tkinter import simpledialog
 import dbmodify
