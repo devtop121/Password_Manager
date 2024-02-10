@@ -33,6 +33,7 @@ def handle_login(db_path):
         print(f"Incorrect username or password")
     conn.close()
 
+#Function takes user parameters and then sends password for validation.
 def new_user(db_path):
             user = input("Enter a username: ")
             password = getpass.getpass("Enter a password: ")
@@ -43,6 +44,7 @@ def new_user(db_path):
             else:
                 validate_password(user, password, db_path)
 
+#Function for solely retyping password. Skips retyping username. Sends password for validation. 
 def retype_password(db_path, user):
             password = getpass.getpass("Enter a password: ")
             re_password = getpass.getpass("Enter password again: ")
@@ -52,6 +54,7 @@ def retype_password(db_path, user):
             else:
                 validate_password(user, password, db_path)
 
+#Validates password using regex. 12 char, 1 special case and a number. If it fails enter retype_password.
 def validate_password(user, password, db_path):
         if len(password) < 12:
             print("Password invalid. It should be atleast 12 characters and include uppercase, special character and a number.")
