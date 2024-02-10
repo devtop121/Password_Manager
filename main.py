@@ -9,7 +9,7 @@ import subprocess
 window = tk.Tk()
 window.title("Login")
 window.geometry('340x440')
-db_path = "H:/Password_manager\pwmanager1.0\sqlite.db"
+db_path = "C:\\pwmanager1.0\\sqlite.db"
 #Creating widgets
 login_label = tk.Label(window, text="Login")
 username_label = tk.Label(window, text="Username")
