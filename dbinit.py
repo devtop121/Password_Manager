@@ -10,8 +10,9 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
+
 #Initialize database, using SQLite.
-def init_db(db_path):
+def init_db(db_path, user, password):
     conn = None
     #initialize 2 tables: user_auth and passwords.
     try:
@@ -38,21 +39,8 @@ def init_db(db_path):
         c.execute(init_users)
         #generate a salt that is different for each database(user)
         salt = secrets.token_hex(16) #16-byte (32 characters) hex salt
-        user = input("Enter a username: ")
-
         #function for making double checking your password. if they dont match it calls the function again.
-        def password_create():
-            password = getpass.getpass("Enter a password: ")
-            re_password = getpass.getpass("Enter password again: ")
-            if password != re_password:
-                print("Passwords didn't match.")
-                return password_create()
-            else:
-                print("Password created.")
-                return password
-        
-            
-        combined_password = password_create() + salt
+        combined_password = password + salt
         hashed_password = hashlib.sha256(combined_password.encode()).hexdigest()
         insert_auth = "INSERT INTO user_auth (user, password, salt) VALUES (?,?,?)"
         #add user to users with name, hashed password and unique salt. i used cryptographic hashing instead of password hashing.
@@ -61,15 +49,6 @@ def init_db(db_path):
         #commit saves changes.
         conn.commit()
         print("Database successfully created.")
-        want_to_login = input("Do you want to login? Yes or No ")
-        if want_to_login.lower() == 'yes':
-            pathdb = "C:/pwpath/path.txt"
-            with open(pathdb, 'r') as file:
-                path = file.read()
-                #call login_handle with path of database.
-                login.handle_login(path)
-        if want_to_login.lower() == 'no':
-            pass
     #incase of error it prints the error e which is determined by error library.
     except Error as e:
         print(e)
