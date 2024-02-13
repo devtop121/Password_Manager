@@ -7,10 +7,36 @@ import login
 import subprocess
 import re
 
+def register():
+    global db_path
+    pathdb = "C:/pwpath/path.txt"
+    try:
+        with open(pathdb, 'r') as file:
+            content1 = file.read()
+            login.new_user(content1)
+    except Exception as e:
+        print("An error occurred, you most likely are yet to install the program. Install it before creating new users.")
+
 def login_menu(db_path):
+
+    def center_window(window, width, height):
+        screen_width = window.winfo_screenwidth()
+        screen_height = window.winfo_screenheight()
+
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+
+        window.geometry(f'{width}x{height}+{x}+{y}')
+
     window = tk.Tk()
     window.title("Login")
-    window.geometry('340x440')
+
+    window_width = 340
+    window_height = 440
+
+    center_window(window, window_width, window_height)
+
+
 
     #db_path = "C:\\pwmanager1.0\\sqlite.db"
     #db_path = "H:/Password_manager\pwmanager1.0\sqlite.db"
@@ -25,9 +51,10 @@ def login_menu(db_path):
     def fetch():
         user = username_entry.get()
         password = password_entry.get()
-        window.destroy()
-        return login.handle_login(db_path,user,password)
-    login_button = tk.Button(window, text="Login", command=fetch) 
+        if password == "" or user == "":
+            return
+        return login.handle_login(db_path,user,password, window)
+    login_button = tk.Button(window, text="Login", command=fetch)
 
     #Placing wdigets on the screen
     login_label.grid(row=0, column=0, columnspan=2)
@@ -36,6 +63,7 @@ def login_menu(db_path):
     password_label.grid(row=2, column=0)
     password_entry.grid(row=2, column=1)
     login_button.grid(row=3, column=0, columnspan=2)
+    
     window.mainloop()
 
 
@@ -122,23 +150,16 @@ def program_installed():
             login_menu(db_path)
     else:
         return install_program()
-    
-program_installed()
+
+if __name__ == "__main__":    
+    program_installed()
 
 
 #gets a value after initialize is finished.
 #db_path = None
 #if main.py is ran directly as a script, not from other scripts as an import
 
-# def register():
-#     global db_path
-#     pathdb = "C:/pwpath/path.txt"
-#     try:
-#         with open(pathdb, 'r') as file:
-#             content1 = file.read()
-#             login.new_user(content1)
-#     except Exception as e:
-#         print("An error occurred, you most likely are yet to install the program. Install it before creating new users.")
+
 
 
 

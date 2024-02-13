@@ -2,13 +2,12 @@ import getpass
 import sqlite3
 import hashlib
 import secrets
-import login
 import main_menu
 import tkinter as tk
 from pathlib import Path
 import re
 #function for checking user and password from auth_user table in database.
-def handle_login(db_path, user, password):
+def handle_login(db_path, user, password, window=None):
     #user = input("Username: ")
     #user = user.strip()
     #password = getpass.getpass("Password: ")
@@ -27,6 +26,8 @@ def handle_login(db_path, user, password):
         password = hashlib.sha256(password.encode()).hexdigest()
         if password == result[1]:
             conn.close()
+            if window != None: 
+                window.destroy()
             main_menu.mainmenu(user, db_path)
         else:
             print(f"Incorrect username or password")

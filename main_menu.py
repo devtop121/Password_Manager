@@ -1,6 +1,5 @@
 import sys
 import sqlite3
-import getpass
 import hashlib
 from tkinter import *
 from tkinter import messagebox
@@ -9,10 +8,22 @@ from tkinter import simpledialog
 import dbmodify
 import requests
 from cryptography.fernet import Fernet
-
+import validator
+import main
 
 global tree
 
+def new_user(user_entry, password_entry, repassword_entry):
+     password = password_entry.get()
+     repassword = repassword_entry.get()
+     user = user_entry.get()
+     pathdb = "C:/pwpath/path.txt"
+     with open(pathdb, 'r') as file:
+        db_path = file.read()
+     if password == repassword:
+          validator.validate_password(user, password, db_path)
+
+    
 #Get a random fact of the day
 def daily_random():
     api_url = 'https://uselessfacts.jsph.pl/'
@@ -41,6 +52,10 @@ def mainmenu(user, db_path):
     def on_closing():
         root.destroy()
         sys.exit()
+    
+    def logout():
+     root.destroy()
+     main.login_menu(db_path)
         
     # Create main window
     root = Tk()
@@ -85,8 +100,30 @@ def mainmenu(user, db_path):
     conn.close()
 
     # Add widgets to frame1
-    label1 = Label(frame1, text=f"Look at all these passwords!")
-    label1.pack()
+    login_frame = ttk.Frame(frame1)
+    login_frame.grid(row=0, column=0, padx=10, pady=10)
+
+    user_label = Label(login_frame, text="New User:")
+    user_label.grid(row=0, column=0, sticky="w")
+    username_entry = Entry(login_frame)
+    username_entry.grid(row=0, column=1)
+
+    password_label = Label(login_frame, text="Password:")
+    password_label.grid(row=1, column=0, sticky="w")
+    password_entry = Entry(login_frame, show="*")  # Show asterisks for password
+    password_entry.grid(row=1, column=1)
+
+    repassword_label = Label(login_frame, text="Confirm Password:")
+    repassword_label.grid(row=2, column=0, sticky="w")
+    repassword_entry = Entry(login_frame, show="*")  # Show asterisks for password
+    repassword_entry.grid(row=2, column=1)
+
+    register_button = ttk.Button(frame1, text="New user", command=lambda: new_user(username_entry, password_entry, repassword_entry))
+    register_button.grid(row=2, column=0)
+
+    logout_button = ttk.Button(frame1, text="Logout", command=logout)
+    logout_button.grid(row=2, column=15)
+
     #Not too sure why first service doesnt work, but add 3 columns which work.
     tree = ttk.Treeview(frame2, columns=("Service", "Username", "Password"), show="headings", height=20)
     tree.heading("#0", text="Service")
@@ -219,8 +256,8 @@ def mainmenu(user, db_path):
     label4 = Label(frame3, text=f"Random fact of the day: {random_fact}")
     label4.pack()
 
-    notebook.add(frame1, text="Passwords")
-    notebook.add(frame2, text="Add/remove passwords")
+    notebook.add(frame1, text="Manage users")
+    notebook.add(frame2, text="Passwords")
     notebook.add(frame3, text="About us")
 
     # Render the menus
