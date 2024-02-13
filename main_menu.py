@@ -10,6 +10,8 @@ import requests
 from cryptography.fernet import Fernet
 import validator
 import main
+import secrets
+import string
 
 global tree
 
@@ -72,7 +74,7 @@ def mainmenu(user, db_path):
     root.protocol("WM_DELETE_WINDOW", on_closing)
 
     # Title of the window
-    root.title("Password Manager 1.0")
+    root.title(f"Password Manager {main.get_version()}")
 
     # Add 2 windows for switching menus
     notebook = ttk.Notebook(root)
@@ -199,6 +201,23 @@ def mainmenu(user, db_path):
         password_label.pack()
         password_entry = Entry(input_window) 
         password_entry.pack()
+
+        def generate_password():
+             characters = string.ascii_letters + string.digits + string.punctuation
+             length = secrets.choice(range(12,17))
+             password = ''.join(secrets.choice(characters) for i in range(length))
+             while (not any(c.isupper() for c in password) or
+                    not any(c.islower() for c in password) or
+                    not any(c.isdigit() for c in password) or
+                    not any(c in string.punctuation for c in password)):
+                password = ''.join(secrets.choice(characters) for i in range(length))
+             password_entry.delete(0, END)
+             password_entry.insert(0, password)
+
+        generate_pwbutton = Button(input_window, text="Generate password", command=generate_password)
+        generate_pwbutton.pack()
+
+
 
         # Button to confirm and insert data
         confirm_button = Button(input_window, text="Confirm", command=handle_insert)

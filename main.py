@@ -7,6 +7,9 @@ import login
 import subprocess
 import re
 
+def get_version():
+    return "1.1"
+
 def register():
     global db_path
     pathdb = "C:/pwpath/path.txt"
@@ -27,9 +30,13 @@ def login_menu(db_path):
         y = (screen_height // 2) - (height // 2)
 
         window.geometry(f'{width}x{height}+{x}+{y}')
+    
+    
+    def on_enter_pressed(event=None):
+        login_button.invoke()  # Trigger the button click
 
     window = tk.Tk()
-    window.title("Login")
+    window.title("Login Menu")
 
     window_width = 340
     window_height = 440
@@ -42,11 +49,12 @@ def login_menu(db_path):
     #db_path = "H:/Password_manager\pwmanager1.0\sqlite.db"
 
     #Creating widgets
-    login_label = tk.Label(window, text="Login")
+    login_label = tk.Label(window, text=f"Welcome! pwmanager version: {get_version()}")
     username_label = tk.Label(window, text="Username")
     username_entry = tk.Entry(window)
     password_entry = tk.Entry(window, show="*")
     password_label = tk.Label(window, text="Password")
+    username_entry.focus_set()
     #Fetching input data
     def fetch():
         user = username_entry.get()
@@ -63,7 +71,8 @@ def login_menu(db_path):
     password_label.grid(row=2, column=0)
     password_entry.grid(row=2, column=1)
     login_button.grid(row=3, column=0, columnspan=2)
-    
+    window.bind("<Return>", on_enter_pressed)
+
     window.mainloop()
 
 
