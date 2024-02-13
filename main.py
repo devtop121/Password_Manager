@@ -43,11 +43,6 @@ def login_menu(db_path):
 
     center_window(window, window_width, window_height)
 
-
-
-    #db_path = "C:\\pwmanager1.0\\sqlite.db"
-    #db_path = "H:/Password_manager\pwmanager1.0\sqlite.db"
-
     #Creating widgets
     login_label = tk.Label(window, text=f"Welcome! pwmanager version: {get_version()}")
     username_label = tk.Label(window, text="Username")

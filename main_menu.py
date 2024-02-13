@@ -12,7 +12,9 @@ import validator
 import main
 import secrets
 import string
-
+import os
+from dotenv import load_dotenv
+import base64
 global tree
 
 def new_user(user_entry, password_entry, repassword_entry):
@@ -91,7 +93,10 @@ def mainmenu(user, db_path):
     salt = c.fetchone()
     salt = salt[0]
     salt = salt.encode('utf-8')
-    key = b'LvoCQRNZcrhoa5LEc3bUneNsApe3Ij2L-RMdbSDTUfk='
+    load_dotenv()
+    key = os.getenv('key')
+    key = key[2:-1]
+    key = key.encode('utf-8')
     combined_key = key + salt
     crypter = Fernet(combined_key)
     def decrypt_value(encrypted_value):
