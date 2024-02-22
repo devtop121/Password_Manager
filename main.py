@@ -8,7 +8,7 @@ import subprocess
 import re
 
 def get_version():
-    return "1.1"
+    return "1.2"
 
 def register():
     global db_path
@@ -84,7 +84,6 @@ def validate_password_main(user, password):
             return None, None
 
 def install_program():
-    
     def install_cryptography():
             try:
                 python_command = sys.executable
@@ -124,9 +123,8 @@ def install_program():
         else:
             print("Passwords didn't match.")
 
-         
     window = tk.Tk()
-    window.title("Pwmanager1.0 installer")
+    window.title(f"Pwmanager{get_version()} installer")
     window.geometry('340x440')
     username_label = tk.Label(window, text="Username")
     username_entry = tk.Entry(window)
@@ -143,8 +141,6 @@ def install_program():
     create_button = tk.Button(window, text="Create user", command=get_values)
     create_button.grid(row=4, column=0, columnspan=2)
     window.mainloop()
-
-
 
 def program_installed():
     path = "C:\\pwpath\\path.txt"

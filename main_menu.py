@@ -26,6 +26,8 @@ def new_user(user_entry, password_entry, repassword_entry):
         db_path = file.read()
      if password == repassword:
           validator.validate_password(user, password, db_path)
+     else:
+          messagebox.showwarning("Invalid input.", "Passwords didn't match.")
 
     
 #Get a random fact of the day
@@ -95,7 +97,6 @@ def mainmenu(user, db_path):
     salt = salt.encode('utf-8')
     load_dotenv()
     key = os.getenv('key')
-    key = key[2:-1]
     key = key.encode('utf-8')
     combined_key = key + salt
     crypter = Fernet(combined_key)
@@ -125,7 +126,7 @@ def mainmenu(user, db_path):
     repassword_entry = Entry(login_frame, show="*")  # Show asterisks for password
     repassword_entry.grid(row=2, column=1)
 
-    register_button = ttk.Button(frame1, text="New user", command=lambda: new_user(username_entry, password_entry, repassword_entry))
+    register_button = ttk.Button(frame1, text="Create User", command=lambda: new_user(username_entry, password_entry, repassword_entry))
     register_button.grid(row=2, column=0)
 
     logout_button = ttk.Button(frame1, text="Logout", command=logout)

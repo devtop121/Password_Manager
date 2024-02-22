@@ -6,6 +6,7 @@ import main_menu
 import tkinter as tk
 from pathlib import Path
 import re
+from tkinter import messagebox
 #function for checking user and password from auth_user table in database.
 def handle_login(db_path, user, password, window=None):
     #user = input("Username: ")
@@ -30,9 +31,9 @@ def handle_login(db_path, user, password, window=None):
                 window.destroy()
             main_menu.mainmenu(user, db_path)
         else:
-            print(f"Incorrect username or password")
+            messagebox.showwarning("Failed login", "Incorrect username or password")
     else:
-        print(f"Incorrect username or password")
+        messagebox.showwarning("Failed login", "Incorrect username or password")
     conn.close()
 
 def new_user(db_path):
@@ -78,10 +79,10 @@ def insert_user(user, password, db_path):
         c.execute(insert_auth, (user, hashed_password, salt))
         # commit saves changes.
         conn.commit()
-        print(f"User {user} successfully created.")
+        messagebox.showwarning("Account created", f"User {user} successfully created")
      except sqlite3.Error as e:
             error_message = str(e)
             if "UNIQUE constraint failed: user_auth.user" in error_message:
-                print("User already exists.")
+                messagebox.showwarning("User exists.", "User already exists.")
             else:
                 print(error_message)
