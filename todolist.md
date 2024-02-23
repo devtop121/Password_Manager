@@ -13,8 +13,8 @@
 4. Figure out a way to protect inserted data. Suggesting AES but it needs some thinking and implementation // DONE
 5. Add something to about us tab and the main tab unless we decide on making the insert/delete tab the "main" tab.
 6. Complete implementing NIST password guidelines 2024 // https://www.auditboard.com/blog/nist-password-guidelines/
-7. Register interface with Tkinter 
-8. Install interface with Tkinter
+7. Register interface with Tkinter // DONE
+8. Install interface with Tkinter // DONE
 9. 
 
 

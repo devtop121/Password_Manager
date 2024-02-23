@@ -6,6 +6,7 @@ import dbinit
 import login
 import subprocess
 import re
+from tkinter import messagebox
 
 def get_version():
     return "1.2"
@@ -73,14 +74,13 @@ def login_menu(db_path):
 
 def validate_password_main(user, password):
         if len(password) < 12:
-            print("Password invalid. It should be atleast 12 characters and include uppercase, special character and a number.")
+            messagebox.showerror("Invalid input", "Password too short. It should be atleast 12 characters long.")
             return None, None
         res = bool(re.search(r'[A-Z]', password) and bool(re.search(r'\d', password) and bool(re.search(r'[!@#$%^&*(),.?":{}|<>]', password))))
         if res == True:
-            print("Correct password format")
             return user, password
         else:
-            print("password invalid")
+            messagebox.showerror("Invalid input", "Make sure the password is atleast 12 characters long, contains uppercase and special characters.")
             return None, None
 
 def install_program():
@@ -89,7 +89,6 @@ def install_program():
                 python_command = sys.executable
                 install_command = [python_command, "-m", "pip", "install", "cryptography"]
                 subprocess.run(install_command, check=True)
-                print("Select a folder for install")
             except subprocess.CalledProcessError as e:
                 print(f"Error installing encryption method: {e}")
 
@@ -104,7 +103,7 @@ def install_program():
                 root = tk.Tk()
                 root.withdraw()
                 #User chooses a path
-                path = askdirectory(title='Select Folder')
+                path = askdirectory(title='Install location')
                 #To this user chosen path we append our main file directory "pwmanager1.0"
                 directory = os.path.join(path, r"pwmanager1.0")
                 db_path = os.path.join(directory, r"sqlite.db")
@@ -121,7 +120,7 @@ def install_program():
                 root.destroy()
                 login_menu(db_path)
         else:
-            print("Passwords didn't match.")
+            messagebox.showerror("Invalid input.", "Passwords didn't match.")
 
     window = tk.Tk()
     window.title(f"Pwmanager{get_version()} installer")
@@ -154,10 +153,6 @@ def program_installed():
 if __name__ == "__main__":    
     program_installed()
 
-
-#gets a value after initialize is finished.
-#db_path = None
-#if main.py is ran directly as a script, not from other scripts as an import
 
 
 

@@ -19,7 +19,8 @@ def init_db(db_path, user, password):
         init_users = """ CREATE TABLE IF NOT EXISTS user_auth (
                                         user TEXT PRIMARY KEY,
                                         password TEXT NOT NULL,
-                                        salt TEXT NOT NULL
+                                        salt TEXT NOT NULL,
+                                        secret TEXT
                                     ); """
         init_table = """ CREATE TABLE IF NOT EXISTS passwords (
                                         id INTEGER PRIMARY KEY,
@@ -48,7 +49,6 @@ def init_db(db_path, user, password):
         c.execute(insert_auth, (user, hashed_password, salt))
         #commit saves changes.
         conn.commit()
-        print("Database successfully created.")
     #incase of error it prints the error e which is determined by error library.
     except Error as e:
         print(e)

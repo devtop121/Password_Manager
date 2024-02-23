@@ -8,6 +8,7 @@ import login
 import os
 import main_menu
 from cryptography.fernet import Fernet
+from dotenv import load_dotenv
 
 # function which updates database with the values from insert data window
 def add_data(db_path, user, website, username, password):
@@ -30,7 +31,10 @@ def add_data(db_path, user, website, username, password):
         salt = salt[0]
         salted_string = password + salt
         salt = salt.encode('utf-8')
-        key = b'LvoCQRNZcrhoa5LEc3bUneNsApe3Ij2L-RMdbSDTUfk='
+        print(type(salt))
+        load_dotenv()
+        key = os.getenv('key')
+        key = key.encode('utf-8')
         combined_key = key + salt
         crypter = Fernet(combined_key)
         pw = crypter.encrypt(password.encode('utf-8'))

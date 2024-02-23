@@ -15,6 +15,12 @@ import string
 import os
 from dotenv import load_dotenv
 import base64
+import auth_2fa
+import qrcode
+from io import BytesIO
+import tkinter as tk
+from PIL import ImageTk, Image
+import pyotp
 global tree
 
 def new_user(user_entry, password_entry, repassword_entry):
@@ -29,7 +35,8 @@ def new_user(user_entry, password_entry, repassword_entry):
      else:
           messagebox.showwarning("Invalid input.", "Passwords didn't match.")
 
-    
+
+
 #Get a random fact of the day
 def daily_random():
     api_url = 'https://uselessfacts.jsph.pl/'
@@ -62,6 +69,30 @@ def mainmenu(user, db_path):
     def logout():
      root.destroy()
      main.login_menu(db_path)
+
+    def enable_2fa():
+        encrypted_secret, secret = auth_2fa.initialize_2fa(user, salt)
+        conn = sqlite3.connect(db_path)
+        c = conn.cursor()
+        c.execute("SELECT secret FROM user_auth WHERE user = ?", (user,))
+        row = c.fetchone()
+        if row is not None and row[0] is not None:
+             messagebox.showerror("Error", "2FA already installed.")
+        else:
+             c.execute("UPDATE user_auth SET secret = ? WHERE user = ?", (encrypted_secret, user))
+             uri = pyotp.totp.TOTP(secret).provisioning_uri(name=f"{user}", issuer_name="PwManager")
+             qr = qrcode.make(uri)
+             # Convert the image to an in-memory byte stream
+             img_byte_stream = BytesIO()
+             qr.save(img_byte_stream, format='PNG')
+             img_byte_stream.seek(0)
+             # Open the QR code image
+             qr_image = Image.open(img_byte_stream)
+             qr_image.show()
+             conn.commit()
+             conn.close()
+             
+        
         
     # Create main window
     root = Tk()
@@ -131,6 +162,11 @@ def mainmenu(user, db_path):
 
     logout_button = ttk.Button(frame1, text="Logout", command=logout)
     logout_button.grid(row=2, column=15)
+
+    auth_fa = ttk.Button(frame1, text="Enable 2FA", command=enable_2fa)
+    auth_fa.grid(row=2, column=16)
+
+    
 
     #Not too sure why first service doesnt work, but add 3 columns which work.
     tree = ttk.Treeview(frame2, columns=("Service", "Username", "Password"), show="headings", height=20)
@@ -231,6 +267,7 @@ def mainmenu(user, db_path):
         input_window.bind("<Return>", lambda event: handle_insert())
 
     def remove_data():
+        confirm = False #make sure confirm is False by default.
         try:
             from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
             from cryptography.hazmat.backends import default_backend
@@ -240,10 +277,13 @@ def mainmenu(user, db_path):
             return
         
         selected_items = tree.selection()
-
         if not selected_items:
             print("No items selected")
             return
+        confirm = messagebox.askyesno("Are you sure?", "Deleting will PERMANENTLY remove selected data.")
+
+        if confirm == False:
+             return
         
         for item in selected_items:
             values = tree.item(item, 'values')
