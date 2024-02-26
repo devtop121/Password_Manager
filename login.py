@@ -57,7 +57,7 @@ def handle_login(db_path, user, password, window=None):
         else:
             handle_login2(db_path, user, password, window)
     except Exception as e:
-         messagebox.showerror("Invalid credentials", "Invalid username or password.")
+         messagebox.showerror("Failed login", "Incorrect username or password.")
 
 
 def handle_login2(db_path, user, password, window=None):

@@ -3,6 +3,7 @@ import sqlite3
 import hashlib
 from tkinter import *
 from tkinter import messagebox
+from tkinter.ttk import Style
 import tkinter.ttk as ttk
 from tkinter import simpledialog
 import dbmodify
@@ -21,6 +22,8 @@ from io import BytesIO
 import tkinter as tk
 from PIL import ImageTk, Image
 import pyotp
+import json
+
 global tree
 
 def new_user(user_entry, password_entry, repassword_entry):
@@ -60,11 +63,15 @@ def populate_treeview(tree, rows):
         tree.insert("", "end", values=row)
 
 def mainmenu(user, db_path):
+    config_file_path = 'conf.json'
+    with open(config_file_path, 'r') as file:
+         config = json.load(file)
     global tree
     # Shut down program once you close the window
     def on_closing():
         root.destroy()
         sys.exit()
+    
     
     def logout():
      root.destroy()
@@ -79,7 +86,6 @@ def mainmenu(user, db_path):
         if row is not None and row[0] is not None:
              messagebox.showerror("Error", "2FA already installed.")
         else:
-             c.execute("UPDATE user_auth SET secret = ? WHERE user = ?", (encrypted_secret, user))
              uri = pyotp.totp.TOTP(secret).provisioning_uri(name=f"{user}", issuer_name="PwManager")
              qr = qrcode.make(uri)
              # Convert the image to an in-memory byte stream
@@ -89,20 +95,51 @@ def mainmenu(user, db_path):
              # Open the QR code image
              qr_image = Image.open(img_byte_stream)
              qr_image.show()
+             cont = messagebox.askokcancel("2fa installer",
+                                    ("WARNING: Read the qr code with for example google authenticator. Press continue ONLY if you successfully scanned the code.")
+             )
+             if cont == True:
+                  c.execute("UPDATE user_auth SET secret = ? WHERE user = ?", (encrypted_secret, user))
              conn.commit()
              conn.close()
              
         
         
-    # Create main window
+    #Get background and text colors from conf.json and save them into textcolor and bgcolor       
+    def bg_color():
+         return config["settings"]["bgmode"]
+    def text_color():
+         return config["settings"]["textmode"]
+    def switch_mode():
+        config_file_path = 'conf.json'
+        with open(config_file_path, 'r') as file:
+            config = json.load(file)
+        placeholder = config["settings"]["textmode"]
+        config["settings"]["textmode"] = config["settings"]["bgmode"]
+        config["settings"]["bgmode"] = placeholder
+        with open(config_file_path, 'w') as file:
+            json.dump(config, file, indent=4)
+        root.destroy()
+        mainmenu(user, db_path)
+        
+
+         
+    
+    textcolor = text_color()
+    bgcolor = bg_color()
+
     root = Tk()
+    root.configure(background=bgcolor)
     root.geometry("800x600")
-    frame = Frame(root)
+    frame = Frame(root, bg=bgcolor)
     frame.pack()
+    
+
+    
 
     # Welcome text
     root.resizable(False, False)
-    label = Label(frame, text=f"Hello {user}")
+    label = Label(frame, text=f"Hello {user}!", background=bgcolor, fg=textcolor)
     label.pack()
 
     # Call function on_closing after exiting window
@@ -110,14 +147,19 @@ def mainmenu(user, db_path):
 
     # Title of the window
     root.title(f"Password Manager {main.get_version()}")
+    
 
-    # Add 2 windows for switching menus
-    notebook = ttk.Notebook(root)
-    frame1 = ttk.Frame(notebook)
-    frame2 = ttk.Frame(notebook)
-    frame3 = ttk.Frame(notebook)
+    # Add 3 windows for switching menus
+    s = ttk.Style()
+    s.configure('My.TFrame', foreground=textcolor, background=bgcolor)
+    s.map('My.TFrame', background=[('selected', 'blue')], foreground=[('selected', 'white')])
+    s.configure('TNotebook.Tab', background=bgcolor, foreground=textcolor)
+    s.map('TNotebook.Tab', background=[('selected', bgcolor)], foreground=[('selected', textcolor)])
+    notebook = ttk.Notebook(root, style='My.TFrame')
+    frame1 = ttk.Frame(notebook, style='My.TFrame')
+    frame2 = ttk.Frame(notebook, style='My.TFrame')
+    frame3 = ttk.Frame(notebook, style='My.TFrame')
     #connect to the database to get users information
-
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute("SELECT website, username, password FROM passwords WHERE user = ?", (user,))
@@ -139,37 +181,40 @@ def mainmenu(user, db_path):
     conn.close()
 
     # Add widgets to frame1
-    login_frame = ttk.Frame(frame1)
+    login_frame = tk.Frame(frame1, background=bgcolor)
     login_frame.grid(row=0, column=0, padx=10, pady=10)
 
-    user_label = Label(login_frame, text="New User:")
+    user_label = Label(login_frame, text="New User:", fg=textcolor, bg=bgcolor)
     user_label.grid(row=0, column=0, sticky="w")
-    username_entry = Entry(login_frame)
+    username_entry = Entry(login_frame, fg=textcolor, bg=bgcolor, insertbackground=textcolor)
     username_entry.grid(row=0, column=1)
 
-    password_label = Label(login_frame, text="Password:")
+    password_label = Label(login_frame, text="Password:", fg=textcolor, bg=bgcolor)
     password_label.grid(row=1, column=0, sticky="w")
-    password_entry = Entry(login_frame, show="*")  # Show asterisks for password
+    password_entry = Entry(login_frame, show="*", fg=textcolor, bg=bgcolor, insertbackground=textcolor)  # Show asterisks for password
     password_entry.grid(row=1, column=1)
 
-    repassword_label = Label(login_frame, text="Confirm Password:")
+    repassword_label = Label(login_frame, text="Confirm Password:",fg=textcolor,bg=bgcolor)
     repassword_label.grid(row=2, column=0, sticky="w")
-    repassword_entry = Entry(login_frame, show="*")  # Show asterisks for password
+    repassword_entry = Entry(login_frame, show="*", fg=textcolor, bg=bgcolor, insertbackground=textcolor)  # Show asterisks for password
     repassword_entry.grid(row=2, column=1)
 
-    register_button = ttk.Button(frame1, text="Create User", command=lambda: new_user(username_entry, password_entry, repassword_entry))
+    register_button = tk.Button(frame1, text="Create User", command=lambda: new_user(username_entry, password_entry, repassword_entry), background=bgcolor, fg=textcolor)
     register_button.grid(row=2, column=0)
 
-    logout_button = ttk.Button(frame1, text="Logout", command=logout)
+    mode_button = tk.Button(frame3, text="Toggle dark/light mode", command=switch_mode, bg=bgcolor, fg=textcolor)
+    mode_button.pack()
+
+    logout_button = tk.Button(frame1, text="Logout", command=logout, bg=bgcolor, fg=textcolor)
     logout_button.grid(row=2, column=15)
 
-    auth_fa = ttk.Button(frame1, text="Enable 2FA", command=enable_2fa)
+    auth_fa = tk.Button(frame1, text="Enable 2FA", command=enable_2fa, bg=bgcolor, fg=textcolor)
     auth_fa.grid(row=2, column=16)
 
     
 
     #Not too sure why first service doesnt work, but add 3 columns which work.
-    tree = ttk.Treeview(frame2, columns=("Service", "Username", "Password"), show="headings", height=20)
+    tree = ttk.Treeview(frame2, columns=("Service", "Username", "Password"), show="headings", height=20, style='My.TFrame')
     tree.heading("#0", text="Service")
     tree.heading("#1", text="Service")
     tree.heading("#2", text="Username")
@@ -180,10 +225,10 @@ def mainmenu(user, db_path):
     tree.column("#2", anchor="center")
     tree.column("#3", anchor="center")
 
-    y_scrollbar = Scrollbar(frame2, orient="vertical", command=tree.yview)
+    y_scrollbar = Scrollbar(frame2, orient="vertical", command=tree.yview, background=bgcolor)
     y_scrollbar.pack(side="right", fill="y")
 
-    tree.configure(yscrollcommand=y_scrollbar.set)
+    tree.configure(yscrollcommand=y_scrollbar.set, style="My.TFrame")
     populate_treeview(tree, decrypted_list)
 
     tree.pack()
@@ -212,8 +257,9 @@ def mainmenu(user, db_path):
             
     
         # Create a new window for user input
-        input_window = Toplevel(frame2)
+        input_window = Toplevel(frame2, background=bgcolor)
         input_window.title("Insert Data")
+        input_window.configure(background=bgcolor)
         input_window.geometry("400x300")
         # Calculate the position to center the window on the screen
         # Center the window on the screen
@@ -227,21 +273,21 @@ def mainmenu(user, db_path):
         input_window.protocol("WM_DELETE_WINDOW", on_close)
 
         # Entry widgets for user input
-        service_label = Label(input_window, text="Service:")
+        service_label = Label(input_window, text="Service:", bg=bgcolor, fg=textcolor)
         service_label.pack()
-        service_entry = Entry(input_window)
+        service_entry = Entry(input_window, fg=textcolor, bg=bgcolor, insertbackground=textcolor)
         service_entry.pack()
         
         service_entry.focus_set()
 
-        username_label = Label(input_window, text="Username:")
+        username_label = Label(input_window, text="Username:", bg=bgcolor, fg=textcolor)
         username_label.pack()
-        username_entry = Entry(input_window)
+        username_entry = Entry(input_window, fg=textcolor, bg=bgcolor, insertbackground=textcolor)
         username_entry.pack()
 
-        password_label = Label(input_window, text="Password:")
+        password_label = Label(input_window, text="Password:", bg=bgcolor, fg=textcolor)
         password_label.pack()
-        password_entry = Entry(input_window) 
+        password_entry = Entry(input_window, fg=textcolor, bg=bgcolor, insertbackground=textcolor) 
         password_entry.pack()
 
         def generate_password():
@@ -256,13 +302,13 @@ def mainmenu(user, db_path):
              password_entry.delete(0, END)
              password_entry.insert(0, password)
 
-        generate_pwbutton = Button(input_window, text="Generate password", command=generate_password)
+        generate_pwbutton = Button(input_window, text="Generate password", command=generate_password, bg=bgcolor, fg=textcolor)
         generate_pwbutton.pack()
 
 
 
         # Button to confirm and insert data
-        confirm_button = Button(input_window, text="Confirm", command=handle_insert)
+        confirm_button = Button(input_window, text="Confirm", command=handle_insert, bg=bgcolor, fg=textcolor)
         confirm_button.pack()
         input_window.bind("<Return>", lambda event: handle_insert())
 
@@ -278,13 +324,10 @@ def mainmenu(user, db_path):
         
         selected_items = tree.selection()
         if not selected_items:
-            print("No items selected")
             return
         confirm = messagebox.askyesno("Are you sure?", "Deleting will PERMANENTLY remove selected data.")
-
         if confirm == False:
              return
-        
         for item in selected_items:
             values = tree.item(item, 'values')
             website, username, password = values  # Assuming this order of values
@@ -302,32 +345,26 @@ def mainmenu(user, db_path):
                 primary_key = result[0]
                 # Perform the removal logic in the database
                 c.execute("DELETE FROM passwords WHERE id = ?", (primary_key,))
-                print(f"Removed data successfully")
-            else:
-                print("No corresponding record found for deletion.")
             conn.commit()
             conn.close()
             update_interface(db_path, user, crypter)
-            
-    add_button = Button(frame2, text="Insert data", command=insert_data)
+    add_button = Button(frame2, text="Insert data", command=insert_data, bg=bgcolor, fg=textcolor)
     add_button.pack()
 
-    remove_button = Button(frame2, text="Remove data", command=remove_data)
+    remove_button = Button(frame2, text="Remove data", command=remove_data, bg=bgcolor, fg=textcolor)
     remove_button.pack()
 
     # Add widgets to frame2
-    label3 = Label(frame3, text="2 Engineers and a hunger for perfected password manager.")
+    label3 = Label(frame3, text="2 Engineers and a hunger for perfected password manager.", bg=bgcolor, fg=textcolor)
     label3.pack()
-    label4 = Label(frame3, text=f"Random fact of the day: {random_fact}")
+    label4 = Label(frame3, text=f"Random fact of the day: {random_fact}", bg=bgcolor, fg=textcolor)
     label4.pack()
 
     notebook.add(frame1, text="Manage users")
     notebook.add(frame2, text="Passwords")
     notebook.add(frame3, text="About us")
-
     # Render the menus
     notebook.pack(fill=BOTH, expand=True)
-
     root.mainloop()
 
 def decrypt_value(encrypted_value, crypter):

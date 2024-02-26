@@ -31,7 +31,6 @@ def add_data(db_path, user, website, username, password):
         salt = salt[0]
         salted_string = password + salt
         salt = salt.encode('utf-8')
-        print(type(salt))
         load_dotenv()
         key = os.getenv('key')
         key = key.encode('utf-8')
@@ -42,7 +41,6 @@ def add_data(db_path, user, website, username, password):
         insert_passwords = "INSERT INTO passwords (user, website, username, password, hashed_password) VALUES (?,?,?,?,?)"
         c.execute(insert_passwords, (user,website,username,pw,hashed_password))
         conn.commit()
-        print("Added data successfully.")
     except Exception as e:
         print(e)
     finally:
