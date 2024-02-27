@@ -2,16 +2,21 @@ import pyotp
 from dotenv import load_dotenv
 import os
 from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import padding
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import hashes
-from io import BytesIO
-import tkinter as tk
+import sys
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 def initialize_2fa(user, salt):
-    load_dotenv()
+    dotenv_path = resource_path('.env')
+    load_dotenv(dotenv_path)
     salt = salt[0]
     salt = salt.encode('utf-8')
     key = os.getenv('key')
@@ -20,11 +25,12 @@ def initialize_2fa(user, salt):
     combined_key = key + salt
     crypter = Fernet(combined_key)
     encrypted_secret = crypter.encrypt(secret.encode('utf-8'))
-    decrypted_secret = crypter.decrypt(encrypted_secret).decode('utf-8')
+    #decrypted_secret = crypter.decrypt(encrypted_secret).decode('utf-8')
     return encrypted_secret, secret
 
 def decrypt_secret(secret, salt):
-    load_dotenv()
+    dotenv_path = resource_path('.env')
+    load_dotenv(dotenv_path)
     salt = salt[0]
     salt = salt.encode('utf-8')
     key = os.getenv('key')

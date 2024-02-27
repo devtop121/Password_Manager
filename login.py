@@ -57,7 +57,7 @@ def handle_login(db_path, user, password, window=None):
         else:
             handle_login2(db_path, user, password, window)
     except Exception as e:
-         messagebox.showerror("Failed login", "Incorrect username or password.")
+         return messagebox.showerror(f"Error occurred.", {e})
 
 
 def handle_login2(db_path, user, password, window=None):
@@ -90,7 +90,6 @@ def new_user(db_path):
             password = getpass.getpass("Enter a password: ")
             re_password = getpass.getpass("Enter password again: ")
             if password != re_password:
-                print("Passwords didn't match.")
                 return retype_password(db_path, user)
             else:
                 validate_password(user, password, db_path)
@@ -99,20 +98,17 @@ def retype_password(db_path, user):
             password = getpass.getpass("Enter a password: ")
             re_password = getpass.getpass("Enter password again: ")
             if password != re_password:
-                print("Passwords didn't match.")
                 return retype_password(db_path, user)
             else:
                 validate_password(user, password, db_path)
 
 def validate_password(user, password, db_path):
         if len(password) < 12:
-            print("Password invalid. It should be atleast 12 characters and include uppercase, special character and a number.")
             retype_password(db_path, user)
         res = bool(re.search(r'[A-Z]', password) and bool(re.search(r'\d', password) and bool(re.search(r'[!@#$%^&*(),.?":{}|<>]', password))))
         if res == True:
             insert_user(user, password, db_path)
         else:
-            print("Password invalid. It should be atleast 12 characters and include uppercase, special character and a number.")
             retype_password(db_path, user)
 
 def insert_user(user, password, db_path):
@@ -134,4 +130,4 @@ def insert_user(user, password, db_path):
             if "UNIQUE constraint failed: user_auth.user" in error_message:
                 messagebox.showerror("User exists.", "User already exists.")
             else:
-                print(error_message)
+                messagebox.showerror("Error", f"{error_message}")

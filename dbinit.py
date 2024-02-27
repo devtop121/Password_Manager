@@ -1,14 +1,8 @@
 import sqlite3
 from sqlite3 import Error
-from pathlib import Path
 import hashlib
 import secrets
-import getpass
-import login
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
 
 
 #Initialize database, using SQLite.

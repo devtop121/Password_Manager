@@ -3,7 +3,6 @@ import sqlite3
 import hashlib
 from tkinter import *
 from tkinter import messagebox
-from tkinter.ttk import Style
 import tkinter.ttk as ttk
 from tkinter import simpledialog
 import dbmodify
@@ -19,15 +18,28 @@ import auth_2fa
 import qrcode
 from io import BytesIO
 import tkinter as tk
-from PIL import ImageTk, Image
+from PIL import Image
 import pyotp
 import json
 global tree
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 
 def new_user(user_entry, password_entry, repassword_entry):
      password = password_entry.get()
      repassword = repassword_entry.get()
      user = user_entry.get()
+     if password == "" and repassword == "" and user == "":
+          return
      pathdb = "C:/pwpath/path.txt"
      with open(pathdb, 'r') as file:
         db_path = file.read()
@@ -61,10 +73,11 @@ def populate_treeview(tree, rows):
         tree.insert("", "end", values=row)
 
 def mainmenu(user, db_path):
-    config_file_path = 'conf.json'
+    config_file_path = resource_path('conf.json')
     with open(config_file_path, 'r') as file:
          config = json.load(file)
     global tree
+
     # Shut down program once you close the window
     def on_closing():
         root.destroy()
@@ -76,6 +89,7 @@ def mainmenu(user, db_path):
      main.login_menu(db_path)
 
     def enable_2fa():
+        
         encrypted_secret, secret = auth_2fa.initialize_2fa(user, salt)
         conn = sqlite3.connect(db_path)
         c = conn.cursor()
@@ -124,7 +138,7 @@ def mainmenu(user, db_path):
     def text_color():
          return config["settings"]["textmode"]
     def switch_mode():
-        config_file_path = 'conf.json'
+        config_file_path = resource_path('conf.json')
         with open(config_file_path, 'r') as file:
             config = json.load(file)
         placeholder = config["settings"]["textmode"]
@@ -181,7 +195,8 @@ def mainmenu(user, db_path):
     salt = c.fetchone()
     salt = salt[0]
     salt = salt.encode('utf-8')
-    load_dotenv()
+    dotenv_path = resource_path('.env')
+    load_dotenv(dotenv_path)
     key = os.getenv('key')
     key = key.encode('utf-8')
     combined_key = key + salt
@@ -327,13 +342,6 @@ def mainmenu(user, db_path):
 
     def remove_data():
         confirm = False #make sure confirm is False by default.
-        try:
-            from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-            from cryptography.hazmat.backends import default_backend
-            from cryptography.hazmat.primitives import padding
-        except Exception as e:
-            return messagebox.showerror("Error occurred", e)
-        
         selected_items = tree.selection()
         if not selected_items:
             return

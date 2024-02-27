@@ -1,26 +1,28 @@
 import sqlite3
-from sqlite3 import Error
-from pathlib import Path
 import hashlib
 import os
 import main_menu
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 from tkinter import messagebox
+import sys
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 # function which updates database with the values from insert data window
 def add_data(db_path, user, website, username, password):
-    try:
-        from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-        from cryptography.hazmat.backends import default_backend
-        from cryptography.hazmat.primitives import padding
-        from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-        from cryptography.hazmat.primitives import hashes
-    except Exception as e:
-        print(e)
-        return
     if len(website) == 0 and len(username) == 0 and len(password) == 0:
         return
-    with open('common_passwords.txt', 'r') as file:
+    config_file_path = resource_path('common_passwords.txt')
+    with open(config_file_path, 'r') as file:
         # Read all lines in the file
         file_contents = file.readlines()
     file_contents = [line.strip() for line in file_contents]

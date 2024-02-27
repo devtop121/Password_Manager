@@ -1,5 +1,4 @@
-import os, sys, stat
-from pathlib import Path
+import os, sys
 import tkinter as tk
 from tkinter.filedialog import askdirectory
 from tkinter import messagebox
@@ -87,11 +86,19 @@ def validate_password_main(user, password):
 def install_program():
     def install_cryptography():
             try:
-                python_command = sys.executable
+                python_command = "python"
                 install_command = [python_command, "-m", "pip", "install", "cryptography"]
-                subprocess.run(install_command, check=True)
+                subprocess.run(install_command, check=False)
+                install_command = [python_command, "-m", "pip", "install", "qrcode[pil]"]
+                subprocess.run(install_command, check=False)
+                install_command = [python_command, "-m", "pip", "install", "pyotp"]
+                subprocess.run(install_command, check=False)
+                install_command = [python_command, "-m", "pip", "install", "python-dotenv"]
+                subprocess.run(install_command, check=False)
+                install_command = [python_command, "-m", "pip", "install", "requests"]
+                subprocess.run(install_command, check=False)
             except subprocess.CalledProcessError as e:
-                print(f"Error installing encryption method: {e}")
+                return messagebox.showerror("Error", f"Error occurred. {e}")
 
     def get_values():
         user = username_entry.get()
