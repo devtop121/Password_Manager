@@ -2,14 +2,11 @@ import sqlite3
 from sqlite3 import Error
 from pathlib import Path
 import hashlib
-import secrets
-import getpass
-import login
 import os
 import main_menu
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
-
+from tkinter import messagebox
 # function which updates database with the values from insert data window
 def add_data(db_path, user, website, username, password):
     try:
@@ -23,6 +20,14 @@ def add_data(db_path, user, website, username, password):
         return
     if len(website) == 0 and len(username) == 0 and len(password) == 0:
         return
+    with open('common_passwords.txt', 'r') as file:
+        # Read all lines in the file
+        file_contents = file.readlines()
+    file_contents = [line.strip() for line in file_contents]
+    if password in file_contents:
+        insert = messagebox.askyesno("Weak password","The password is in a list of common passwords. Using this password negates any use of a password manager. Proceed?")
+        if insert == False:
+            return
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     try:

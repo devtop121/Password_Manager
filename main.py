@@ -2,6 +2,7 @@ import os, sys, stat
 from pathlib import Path
 import tkinter as tk
 from tkinter.filedialog import askdirectory
+from tkinter import messagebox
 import dbinit
 import login
 import subprocess
@@ -19,7 +20,7 @@ def register():
             content1 = file.read()
             login.new_user(content1)
     except Exception as e:
-        print("An error occurred, you most likely are yet to install the program. Install it before creating new users.")
+        messagebox.showerror("Error installing", e)
 
 def login_menu(db_path):
 
@@ -111,7 +112,7 @@ def install_program():
                 pathfile = "C:/pwpath/path.txt"
                 os.mkdir(directory)
                 os.mkdir("C:/pwpath/")
-                print("Created directory at", directory)
+                messagebox.showinfo("Installer pwmanager", f"Successfully installed at {directory}")
                 #write to this path.txt the path for further use.
                 with open(pathfile, 'w') as file:
                     file.write(db_path)

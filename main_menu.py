@@ -15,7 +15,6 @@ import secrets
 import string
 import os
 from dotenv import load_dotenv
-import base64
 import auth_2fa
 import qrcode
 from io import BytesIO
@@ -23,7 +22,6 @@ import tkinter as tk
 from PIL import ImageTk, Image
 import pyotp
 import json
-
 global tree
 
 def new_user(user_entry, password_entry, repassword_entry):
@@ -95,15 +93,30 @@ def mainmenu(user, db_path):
              # Open the QR code image
              qr_image = Image.open(img_byte_stream)
              qr_image.show()
-             cont = messagebox.askokcancel("2fa installer",
-                                    ("WARNING: Read the qr code with for example google authenticator. Press continue ONLY if you successfully scanned the code.")
-             )
-             if cont == True:
+             totp = pyotp.TOTP(secret)
+             qr_verify = simpledialog.askstring("QR installer", "Enter 2fa code to confirm: ")
+             if qr_verify is None:
+                return 
+             if qr_verify == totp.now():
                   c.execute("UPDATE user_auth SET secret = ? WHERE user = ?", (encrypted_secret, user))
+                  messagebox.showinfo("Success", "You have successfully activated 2fa.")
+             else:
+                  messagebox.showerror("Error", "Wrong code for 2fa activation.")
+                  re_enter_2fa(totp, encrypted_secret)
              conn.commit()
              conn.close()
              
-        
+    def re_enter_2fa(totp, encrypted_secret):
+        qr_verify = simpledialog.askstring("QR installer", "Enter 2fa code to confirm: ")
+        if qr_verify is None:
+             return 
+        if qr_verify == totp.now():
+                  c.execute("UPDATE user_auth SET secret = ? WHERE user = ?", (encrypted_secret, user))
+                  messagebox.showinfo("Success", "You have successfully activated 2fa.")
+        else:
+             messagebox.showerror("Error", "Wrong code for 2fa activation.")
+             re_enter_2fa(totp, encrypted_secret)
+         
         
     #Get background and text colors from conf.json and save them into textcolor and bgcolor       
     def bg_color():
@@ -319,8 +332,7 @@ def mainmenu(user, db_path):
             from cryptography.hazmat.backends import default_backend
             from cryptography.hazmat.primitives import padding
         except Exception as e:
-            print(e)
-            return
+            return messagebox.showerror("Error occurred", e)
         
         selected_items = tree.selection()
         if not selected_items:

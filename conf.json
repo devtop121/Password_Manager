@@ -1,7 +1,7 @@
 {
     "settings": {
-        "bgmode": "#FFFFFF",
+        "bgmode": "#000000",
         "autofill": true,
-        "textmode": "#000000"
+        "textmode": "#FFFFFF"
     }
 }
